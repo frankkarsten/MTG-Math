@@ -30,24 +30,33 @@ def multivariate_hypgeom(deck, needed):
 		sum_needed += needed[card]
 	return answer / binom(sum_deck, sum_needed)
 
-def determine_KeepableHand(handsize = 7):
+def determine_KeepableHand(handsize, mulltype):
 	"""	
 	Parameters:
-		handsize - Should only be used for Vancouver rule. Represents the number of cards you mulligan towards
-	Returns - a number that represents the probability of finding an opening hand with one of each combo piece and two lands
+		handsize - Represents the number of cards you mulligan towards. Should be 7, 6, 5, or 4.
+		mulltype - Vancouver or London
+	Returns - a number that represents the probability of finding an opening hand with 2-3 lands and 2+ spells
+	Note: A prior version of this document didn't adequately consider how to put back cards after London mull
 	"""
+	number_mulls = 7 - handsize
+	if (mulltype == 'London'):
+		number_cards_to_draw = 7
+		max_lands_for_keepable_hand = 3 + number_mulls
+	if (mulltype == 'Vancouver'):
+		number_cards_to_draw = handsize
+		max_lands_for_keepable_hand = 3
 	Keephand_prob = 0
-	for Land in [2, 3]:
-		for Spell in [2, 3, 4, 5]:
-			if Land + Spell == handsize:
+	for Land in range (2, max_lands_for_keepable_hand + 1):
+		for Spell in range(2, 5 + 1):
+			if Land + Spell == number_cards_to_draw:
 				needed = {}
 				needed['Land'] = Land
 				needed['Spell'] = Spell
 				Keephand_prob += multivariate_hypgeom(deck, needed)
 	return Keephand_prob
 
-def determine_FAILKeepableHand(handsize = 7):
-	return 1 - determine_KeepableHand(handsize)
+def determine_FAILKeepableHand(handsize, mulltype):
+	return 1 - determine_KeepableHand(handsize, mulltype)
 	
 max_mulligans = 2
 
@@ -59,14 +68,18 @@ for number_lands in range(16,30):
 		'Land': number_lands,
 		'Spell': 60 - number_lands
 	}
+	Prob_prior_mulligans = 1
 	for mulligans in range(4):
-		probability_keephand = 1 - (determine_FAILKeepableHand() ** (mulligans + 1))
+		probability_keephand = 1 - Prob_prior_mulligans * determine_FAILKeepableHand(7 - mulligans, 'London')
 		print(f'{number_lands} lands - When willing to mull down to {7 - mulligans}, probability is {probability_keephand * 100:.3f}%.')
 		if (mulligans == max_mulligans) and probability_keephand > optimal_prob:
 			optimal_prob = probability_keephand
 			optimal_lands = number_lands
+		Prob_prior_mulligans *= determine_FAILKeepableHand(7 - mulligans, 'London')
 print("The optimal number of lands (max_mulls="+str(max_mulligans)+") is "+str(optimal_lands))
 
+optimal_lands = 16
+optimal_prob = 0
 print("Vancouver probability of keepable opening hand?")
 for number_lands in range(16,30):
 	deck = {
@@ -75,10 +88,10 @@ for number_lands in range(16,30):
 	}
 	Prob_prior_mulligans = 1
 	for mulligans in range(4):
-		probability_keephand = 1 - Prob_prior_mulligans * determine_FAILKeepableHand(7 - mulligans)
+		probability_keephand = 1 - Prob_prior_mulligans * determine_FAILKeepableHand(7 - mulligans, 'Vancouver')
 		print(f'{number_lands} lands - When willing to mull down to {7 - mulligans}, probability is {probability_keephand * 100:.3f}%.')
 		if (mulligans == max_mulligans) and probability_keephand > optimal_prob:
 			optimal_prob = probability_keephand
 			optimal_lands = number_lands
-		Prob_prior_mulligans *= determine_FAILKeepableHand(7 - mulligans)
+		Prob_prior_mulligans *= determine_FAILKeepableHand(7 - mulligans, 'Vancouver')
 print("The optimal number of lands (max_mulls="+str(max_mulligans)+") is "+str(optimal_lands))
