@@ -5,7 +5,7 @@ def log(s):
         print(s)
 
 DEBUG = False
-mulligan_to = 3
+mulligan_to = 4
 max_mulls = 7 - mulligan_to    
 num_iterations = 10 ** 6
 on_draw = True
