@@ -212,7 +212,7 @@ def simulate_one_game(hand, library, drawfirst):
 	"""
 	
 	#Initialize variables
-	Hogaak_cmc = 8
+	Hogaak_cmc = 7
 	llog("----------Start of a new game----------")
 	turn = 1
 	battlefield = {}
