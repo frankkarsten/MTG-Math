@@ -5,15 +5,10 @@ from itertools import combinations
 #import sys
 #sys.stdout = open('outputfile.txt', 'w')
 
-def llog(s):
-    if SUPERDEBUG:
-        print(s)
-
 def log(s):
     if DEBUG:
         print(s)
 
-SUPERDEBUG = False
 DEBUG = False
 
 decklist = {
@@ -28,12 +23,9 @@ decklist = {
 	'Faithless Looting': 4,
 	'Interactive': 4,
 	'Bloodstained Mire': 10,
-	'City of Brass': 10
+	'Gemstone Mine': 10
 }
-
-#All non-fetch lands treated as fetcheable City of Brass. 
-#This is an extreme modeling, but it keeps me sane because
-#it greatly simplifies what we need to keep track of.
+#All non-fetch lands treated as fetcheable Gemstone Mine. 
 
 def choose_discard(hand, number_remaining_discard):
 	"""	
@@ -46,7 +38,7 @@ def choose_discard(hand, number_remaining_discard):
 	
 	#If you have a fetchland, then just discard regular lands early
 	if (hand['Bloodstained Mire'] >= 1):
-		priority_list = ['Bloodghast', 'Vengevine', 'City of Brass', 'Interactive', 'Gravecrawler', 
+		priority_list = ['Bloodghast', 'Vengevine', 'Gemstone Mine', 'Interactive', 'Gravecrawler', 
 			'Insolent Neonate', 'Carrion Feeder', 'Faithless Looting', 'Satyr Wayfinder', 
 			'Stitchers Supplier', 'Bloodstained Mire', 'Hogaak']
 	
@@ -54,7 +46,7 @@ def choose_discard(hand, number_remaining_discard):
 	else:
 		priority_list = ['Bloodghast', 'Vengevine', 'Interactive', 'Gravecrawler',
 			'Insolent Neonate', 'Carrion Feeder', 'Faithless Looting', 'Satyr Wayfinder',
-			'Stitchers Supplier', 'Hogaak', 'City of Brass', 'Bloodstained Mire']
+			'Stitchers Supplier', 'Hogaak', 'Gemstone Mine', 'Bloodstained Mire']
 	
 	for card in priority_list:
 		number_to_discard = min(hand[card], number_remaining_discard)
@@ -67,37 +59,36 @@ def describe_game_state(hand, battlefield, graveyard, library):
 	"""	
 	This function is merely used while debugging simulate_one_game
 	"""
-	llog("")
-	llog("Hand is now:")
-	llog(hand)
-	llog("Battlefield is now:")
-	llog(battlefield)
-	llog("Graveyard is now:")
-	llog(graveyard)
-	llog("Library is now:")
-	llog(library)
-	llog(Counter(library))
-	llog("")
+	log("")
+	log("Hand is now:")
+	log(hand)
+	log("Battlefield is now:")
+	log(battlefield)
+	log("Graveyard is now:")
+	log(graveyard)
+	log("Library is now:")
+	log(Counter(library))
+	log("")
 
 def play_fetchland(hand, battlefield, graveyard, library): 
 	"""	
 	This function edits the parameters self-explanatorily for simulate_one_game
 	"""
 	hand['Bloodstained Mire'] -= 1
-	library.remove('City of Brass')
+	library.remove('Gemstone Mine')
 	random.shuffle(library)
-	battlefield['City of Brass'] += 1
+	battlefield['Gemstone Mine'] += 1
 	graveyard['Bloodstained Mire'] +=1
-	llog("We fetched.")
+	log("We fetched.")
 	describe_game_state(hand, battlefield, graveyard, library)
  
 def play_land(hand, battlefield, graveyard, library): 
 	"""	
 	This function edits the parameters self-explanatorily for simulate_one_game
 	"""
-	hand['City of Brass'] -= 1
-	battlefield['City of Brass'] += 1
-	llog("We played City of Brass.")
+	hand['Gemstone Mine'] -= 1
+	battlefield['Gemstone Mine'] += 1
+	log("We played Gemstone Mine.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Supplier(hand, battlefield, graveyard, library): 
@@ -110,7 +101,7 @@ def play_Supplier(hand, battlefield, graveyard, library):
 	for _ in range(3):
 		card_milled = library.pop(0)
 		graveyard[card_milled] += 1
-	llog("We play a Stitchers Supplier.")
+	log("We play a Stitchers Supplier.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Looting(hand, battlefield, graveyard, library): 
@@ -119,17 +110,17 @@ def play_Looting(hand, battlefield, graveyard, library):
 	"""
 	hand['Faithless Looting'] -= 1
 	graveyard['Faithless Looting'] += 1
-	llog("We play a Faithless Looting.")
+	log("We play a Faithless Looting.")
 	for _ in range(2):
 		card_drawn = library.pop(0)
 		hand[card_drawn] += 1
-		llog("We drew: " + card_drawn +"\n")
+		log("We drew: " + card_drawn +"\n")
 	#Use the function choose_discard to figure out which cards to discard
 	cards_to_discard = choose_discard(hand, 2)
 	for card in cards_to_discard:
 		hand[card] -= 1
 		graveyard[card] += 1
-		llog("We discard: " + card +"\n")
+		log("We discard: " + card +"\n")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Neonate(hand, battlefield, graveyard, library):
@@ -138,7 +129,7 @@ def play_Neonate(hand, battlefield, graveyard, library):
 	"""
 	hand['Insolent Neonate'] -= 1
 	graveyard['Insolent Neonate'] += 1
-	llog("We play an Insolent Neonate and sac it.")
+	log("We play an Insolent Neonate and sac it.")
 	#We immediately sacrifice Neonate!
 	if (sum(hand.values()) > 0):
 		#Use the function choose_discard to figure out which card to discard
@@ -146,10 +137,10 @@ def play_Neonate(hand, battlefield, graveyard, library):
 		for card in cards_to_discard:
 			hand[card] -= 1
 			graveyard[card] += 1
-			llog("We discard: " + card +"\n")
+			log("We discard: " + card +"\n")
 		card_drawn = library.pop(0)
 		hand[card_drawn] += 1
-		llog("We drew: " + card_drawn +"\n")
+		log("We drew: " + card_drawn +"\n")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Feeder(hand, battlefield, graveyard, library):
@@ -158,7 +149,7 @@ def play_Feeder(hand, battlefield, graveyard, library):
 	"""
 	hand['Carrion Feeder'] -= 1
 	battlefield['Carrion Feeder'] += 1
-	llog("We play a Carrion Feeder.")
+	log("We play a Carrion Feeder.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Gravecrawler_from_hand(hand, battlefield, graveyard, library):
@@ -167,7 +158,7 @@ def play_Gravecrawler_from_hand(hand, battlefield, graveyard, library):
 	"""
 	hand['Gravecrawler'] -= 1
 	battlefield['Gravecrawler'] += 1
-	llog("We play a Gravecrawler from hand.")
+	log("We play a Gravecrawler from hand.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Gravecrawler_from_graveyard(hand, battlefield, graveyard, library):
@@ -176,7 +167,7 @@ def play_Gravecrawler_from_graveyard(hand, battlefield, graveyard, library):
 	"""
 	graveyard['Gravecrawler'] -= 1
 	battlefield['Gravecrawler'] += 1
-	llog("We play a Gravecrawler from hand.")
+	log("We play a Gravecrawler from graveyard.")
 	describe_game_state(hand, battlefield, graveyard, library)
 	
 def play_Bloodghast_from_hand(hand, battlefield, graveyard, library):
@@ -185,7 +176,7 @@ def play_Bloodghast_from_hand(hand, battlefield, graveyard, library):
 	"""
 	hand['Bloodghast'] -= 1
 	battlefield['Bloodghast'] += 1
-	llog("We play a Bloodghast from hand.")
+	log("We play a Bloodghast from hand.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def play_Wayfinder(hand, battlefield, graveyard, library):
@@ -198,7 +189,7 @@ def play_Wayfinder(hand, battlefield, graveyard, library):
 	for _ in range(4):
 		card_milled = library.pop(0)
 		graveyard[card_milled] += 1
-	llog("We play a Satyr Wayfinder.")
+	log("We play a Satyr Wayfinder.")
 	describe_game_state(hand, battlefield, graveyard, library)
 
 def simulate_one_game(hand, library, drawfirst):
@@ -213,7 +204,7 @@ def simulate_one_game(hand, library, drawfirst):
 	
 	#Initialize variables
 	Hogaak_cmc = 7
-	llog("----------Start of a new game----------")
+	log("----------Start of a new game----------")
 	turn = 1
 	battlefield = {}
 	graveyard = {}
@@ -222,23 +213,23 @@ def simulate_one_game(hand, library, drawfirst):
 		battlefield[card] = 0
 		
 	#Draw a card if on the draw
-	llog("Welcome to turn "+ str(turn))
+	log("Welcome to turn "+ str(turn))
 	describe_game_state(hand, battlefield, graveyard, library)
 	if (drawfirst):
 		card_drawn = library.pop(0)
 		hand[card_drawn] += 1
-		llog("We drew: " + card_drawn +"\n")
+		log("We drew: " + card_drawn +"\n")
 	
 	#Play a land
 	land_played = False 
 	if (hand['Bloodstained Mire'] > 0):
 		play_fetchland(hand, battlefield, graveyard, library)
 		land_played = True
-	if (hand['City of Brass'] > 0 and land_played == False):
+	if (hand['Gemstone Mine'] > 0 and land_played == False):
 		play_land(hand, battlefield, graveyard, library)
 		land_played = True
 	
-	mana_available = battlefield['City of Brass']
+	mana_available = battlefield['Gemstone Mine']
 	
 	#TURN 1 GAMEPLAY SEQUENCE
 	
@@ -249,7 +240,7 @@ def simulate_one_game(hand, library, drawfirst):
 	
 	#If you already hold Satyr Wayfinder and a second land, play a black creature if possible
 	#This potentially enables turn-2 Wayfinder into Hogaak
-	if (hand['Satyr Wayfinder'] > 0 and hand['Bloodstained Mire'] + hand['City of Brass'] > 0):
+	if (hand['Satyr Wayfinder'] > 0 and hand['Bloodstained Mire'] + hand['Gemstone Mine'] > 0):
 		if (hand['Carrion Feeder'] > 0 and mana_available >= 1):
 			mana_available -= 1
 			play_Feeder(hand, battlefield, graveyard, library)
@@ -277,13 +268,13 @@ def simulate_one_game(hand, library, drawfirst):
 	turn = 2
 	
 	#Draw a card
-	llog("Welcome to turn "+ str(turn))
+	log("Welcome to turn "+ str(turn))
 	describe_game_state(hand, battlefield, graveyard, library)
 	card_drawn = library.pop(0)
 	hand[card_drawn] += 1
-	llog("We drew: " + card_drawn+"\n")
+	log("We drew: " + card_drawn+"\n")
 
-	mana_available = battlefield['City of Brass']
+	mana_available = battlefield['Gemstone Mine']
 	land_played = False 
 	
 	#TURN 2 GAMEPLAY SEQUENCE BEFORE PLAYING LAND
@@ -291,12 +282,13 @@ def simulate_one_game(hand, library, drawfirst):
 	#If we can cast land, Satyr Wayfinder, Hogaak, then just do that
 	#Also, if we have no Hogaak yet and no Stitcher's Supplier in hand...
 	#...but Wayfinder would enable Hogaak if it's in the top 4, then just go for that
-	castable_Wayfinder = hand['Bloodstained Mire'] + hand['City of Brass'] > 0 and hand['Satyr Wayfinder'] >= 1
+	castable_Wayfinder = hand['Bloodstained Mire'] + hand['Gemstone Mine'] > 0 and hand['Satyr Wayfinder'] >= 1
 	black_creature_for_convoke = battlefield['Carrion Feeder'] + battlefield['Stitchers Supplier'] + battlefield['Gravecrawler'] + graveyard['Bloodghast']
 	delve_count_after_Wayfinder = sum(graveyard.values()) + min(hand['Bloodstained Mire'], 1) + 4
-	Hogaak_hand_castable = black_creature_for_convoke >= 1 and delve_count_after_Wayfinder + 1 + black_creature_for_convoke >= Hogaak_cmc
+	Wayfinder_contrib = 1
+	Hogaak_hand_castable = black_creature_for_convoke + Wayfinder_contrib >= 2 and delve_count_after_Wayfinder + Wayfinder_contrib + black_creature_for_convoke >= Hogaak_cmc
 	Hogaak_hand_enabled = hand['Hogaak'] >= 1 and Hogaak_hand_castable
-	Hogaak_graveyard_castable = black_creature_for_convoke >= 1 and delve_count_after_Wayfinder - 1 + 1 + black_creature_for_convoke >= Hogaak_cmc
+	Hogaak_graveyard_castable = black_creature_for_convoke + Wayfinder_contrib >= 2 and delve_count_after_Wayfinder - 1 + Wayfinder_contrib + black_creature_for_convoke >= Hogaak_cmc
 	Hogaak_graveyard_enabled = graveyard['Hogaak'] >= 1 and Hogaak_graveyard_castable
 	Hogaak_sure = castable_Wayfinder and ( Hogaak_hand_enabled or Hogaak_graveyard_enabled)
 	Hogaak_possible = castable_Wayfinder and ( Hogaak_hand_castable or Hogaak_graveyard_castable)
@@ -306,7 +298,7 @@ def simulate_one_game(hand, library, drawfirst):
 		if (hand['Bloodstained Mire'] > 0):
 			play_fetchland(hand, battlefield, graveyard, library)
 			land_played = True
-		if (hand['City of Brass'] > 0 and land_played == False):
+		if (hand['Gemstone Mine'] > 0 and land_played == False):
 			play_land(hand, battlefield, graveyard, library)
 			land_played = True
 		mana_available += 1
@@ -359,7 +351,7 @@ def simulate_one_game(hand, library, drawfirst):
 
 	#If we saw no Hogaak yet and have another B/G convoker, then sac Supplier to Feeder
 	#We do this before playing a land due to Bloodghast
-	land_in_hand = hand['Bloodstained Mire'] + hand['City of Brass'] > 0
+	land_in_hand = hand['Bloodstained Mire'] + hand['Gemstone Mine'] > 0
 	creature_available = hand['Stitchers Supplier'] + hand['Carrion Feeder'] + hand['Gravecrawler'] + graveyard['Gravecrawler'] + graveyard['Bloodghast'] > 0
 	Vengevine_available = hand['Insolent Neonate'] > 0 and graveyard['Vengevine'] > 0
 	other_convoker = land_in_hand and ( creature_available or Vengevine_available)
@@ -376,7 +368,7 @@ def simulate_one_game(hand, library, drawfirst):
 		play_fetchland(hand, battlefield, graveyard, library)
 		land_played = True
 		mana_available += 1
-	if (hand['City of Brass'] > 0 and land_played == False):
+	if (hand['Gemstone Mine'] > 0 and land_played == False):
 		play_land(hand, battlefield, graveyard, library)
 		land_played = True
 		mana_available += 1
@@ -436,7 +428,7 @@ def simulate_one_game(hand, library, drawfirst):
 	#Play Neonate or Looting if possible
 	#If you can return Vengevine, then choose Neonate over Looting
 	#Otherwise, play Looting over Neonate
-	condition = graveyard['Vengevine'] or hand['Faithless Looting'] == 0
+	condition = graveyard['Vengevine'] > 0 or hand['Faithless Looting'] == 0
 	if (condition and hand['Insolent Neonate'] > 0 and mana_available >= 1):
 		mana_available -= 1
 		creatures_cast_for_Vengevine += 1
@@ -503,11 +495,11 @@ def simulate_one_game(hand, library, drawfirst):
 
 	#Return True if we were able to cast Hogaak
 	if (Hogaak_cast):
-		llog("Succes!!!\n")
+		log("Succes!!!\n")
 		return True
 	else:
-		llog("Failure!!!\n")
-		return False	
+		log("Failure!!!\n")
+		return False
 
 def simulate_one_specific_hand(hand, bottom, drawfirst, num_iterations):
 	"""	
@@ -516,14 +508,14 @@ def simulate_one_specific_hand(hand, bottom, drawfirst, num_iterations):
 		bottom - A dictionary, with the same cardnames as in deck, with cards that will be put on the bottom
 			(This is due to London mull. Bottom order is currently arbitrary and assumed to be irrelevant.)
 		drawfirst - A boolean that is True if on the draw and False on the play
-		num_iterations - Simulation sample size. Could be 10 if precision isn't important, far more otherwise.
+		num_iterations - Simulation sample size. Could be 10 if precision isn't important, could be 100,000 if it's important.
 	Returns - the probability of achieving the goal with this opening hand
 	"""
 	count_good_hands = 0.0
 	
 	for i in range(num_iterations):
 		
-		llog("Welcome to iteration number "+ str(i))
+		log("Welcome to iteration number "+ str(i))
 		#Copy opening hand information into a variable that can be manipulated in the simulation
 		sim_hand = {}
 		for card in decklist.keys():
@@ -536,6 +528,7 @@ def simulate_one_specific_hand(hand, bottom, drawfirst, num_iterations):
 		random.shuffle(sim_library)
 		
 		#Then put the bottom part on the bottom
+		#The order is assumed not to matter here
 		for card in bottom.keys():
 			sim_library += [card] * bottom[card]
 			
@@ -552,51 +545,48 @@ def what_to_put_on_bottom (hand, drawfirst, number_bottom, num_iterations):
 		hand - A dictionary, with the same cardnames as in deck, with number drawn
 		drawfirst - A boolean that is True if on the draw and False on the play
 		number_bottom - The number of cards that needs to be put on the bottom
+		num_iterations - Simulation sample size. Could be 10 if precision isn't important, could be 10,000 if it's important.
 	Returns - A dictionary, with the same cardnames as in deck, with the best set of cards to put on the bottom
+	Note - the optimization criterion is maximized, not minimized. That's appropriate if it's a success probability.
 	"""	
 	best_goal = 0
 	best_bottom = {}
-	llog("Welcome to the what_to_put_on_bottom function!")
 	
 	#Transform hand into a list to be able to iterate handily
 	hand_list = []
 	for card in hand.keys():
 		hand_list += [card] * hand[card]
-	llog("hand_list is:")
-	llog(hand_list)
-	llog("")
 	
 	#Iterate over all tuples of length number_bottom containing elements from hand_list 
+	#There may be duplicates right now, that's bad for runtime but shouldn't affect the maximum
 	for bottom in combinations(hand_list, number_bottom):
-		llog("********************************************************************")
-		llog("Currently considering the following bottom:")
-		llog(bottom)
+		log("Currently considering the following bottom:")
+		log(bottom)
 		#Transform back to dictionary for convenience
 		bottom_dict = {}
 		for card in decklist.keys():
 			bottom_dict[card] = 0
 		for card in bottom:
 			bottom_dict[card] += 1
-		llog(bottom_dict)
 		
 		remaining_hand = {}
 		for card in decklist.keys():
 			remaining_hand[card] = hand[card] - bottom_dict[card]
-		llog("Remaining hand:")
-		llog(remaining_hand)
+		log("Remaining hand:")
+		log(remaining_hand)
 		
 		goal = simulate_one_specific_hand(remaining_hand, bottom_dict, drawfirst, num_iterations)
-		llog("Goal: "+str(goal))
+		log("Goal: "+str(goal))
 		
 		if (goal >= best_goal):
 			best_goal = goal
 			for card in decklist.keys():
 				best_bottom[card] = bottom_dict[card]
-			llog("We now set best_goal to "+str(best_goal)+" and best_bottom to:")
-			llog(best_bottom)
+			log("We now set best_goal to "+str(best_goal)+" and best_bottom to:")
+			log(best_bottom)
 	
-	llog("THE BEST BOTTOM IS:")
-	llog(best_bottom)
+	log("THE BEST BOTTOM IS:")
+	log(best_bottom)
 	
 	return best_bottom
 	
@@ -605,26 +595,29 @@ def simulate_one_handsize(handsize, drawfirst):
 	Parameters:
 		handsize - Opening hand size, could be in {0, 1, ..., 6, 7}
 		drawfirst - A boolean that is True if on the draw and False on the play
-	Returns - the probability of achieving the goal with this opening hand size
-	Note - for handsize > 1 the value of success_probability(handsize - 1) needs to be known
+	Returns - the probability of achieving the goal with this opening hand size and play/draw setting
+	Note - for handsize > 1 the value of success_probability(handsize - 1) needs to be known!!!
 	"""
 	multiplier_for_handsize_iteration = handsize 
-	num_hands = 5000 * multiplier_for_handsize_iteration
+	#The following numbers can be adjusted manually to increase/decrease total runtime
+	sample_size_for_num_hands = 5000 * handsize if handsize < 7 else 100000
+	sample_size_per_bottom = 3 * handsize
+	sample_size_per_hand_under_best_bottom = 10 * handsize
+	
 	count_probability = 0.0
 
 	#Construct library as a list
 	library = []
 	for card in decklist.keys():
 		library += [card] * decklist[card]
-	llog(library)
+	log(library)
 	
-
-	for iterator in range(num_hands):
+	for iterator in range(sample_size_for_num_hands):
 		
-		if(iterator % 1000 == 0):
-			print(f'We are now on hand number {iterator}.')
-		llog("")
-		llog("------------Welcome to a new iteration!------------")
+		if( iterator > 100 and iterator % 1000 == 0):
+			print(f'We are now on hand number {iterator}. Current prob = {count_probability / iterator * 100 :.2f} %.')
+		log("")
+		log("------------Welcome to a new iteration!------------")
 		
 		#Construct a random opening hand
 		#Here, random.sample takes a random sample of 7 cards from library without replacement
@@ -634,7 +627,12 @@ def simulate_one_handsize(handsize, drawfirst):
 		log("The opening hand is:" + str(opening_hand))
 	
 		#Determine the set of cards that are best to put on the bottom
-		best_bottom = what_to_put_on_bottom(opening_hand, drawfirst, 7 - handsize, 5 * multiplier_for_handsize_iteration)
+		if (handsize < 7):
+			best_bottom = what_to_put_on_bottom(opening_hand, drawfirst, 7 - handsize, sample_size_per_bottom)
+		else:
+			best_bottom = {} 
+			for card in decklist.keys():
+				best_bottom[card] = 0
 		log("The best bottom is:" + str(best_bottom))
 		
 		#Take the bottom part from the hand part
@@ -642,57 +640,20 @@ def simulate_one_handsize(handsize, drawfirst):
 			opening_hand[card] = opening_hand[card] - best_bottom[card]
 		
 		#For a one-card opening hand we auto-keep
-		if (handsize == 1):
-			succes_prob = simulate_one_specific_hand(opening_hand, best_bottom, drawfirst, 50 * multiplier_for_handsize_iteration)
+		if (handsize <= 1):
+			succes_prob = simulate_one_specific_hand(opening_hand, best_bottom, drawfirst, sample_size_per_hand_under_best_bottom)
 			
 		#For a larger opening hand we choose keep or mull based on success probability
 		if (handsize > 1):
-			succes_prob_when_keep = simulate_one_specific_hand(opening_hand, best_bottom, drawfirst, 50 * multiplier_for_handsize_iteration)
+			succes_prob_when_keep = simulate_one_specific_hand(opening_hand, best_bottom, drawfirst, sample_size_per_hand_under_best_bottom)
 			succes_prob_when_mull = success_probability[handsize - 1]
 			succes_prob = max(succes_prob_when_keep, succes_prob_when_mull)
+			log("Success prob: "+ str(succes_prob))
 		count_probability += succes_prob
 		
 		log("Succes_prob = "+ str(succes_prob))
 		
-	return count_probability / num_hands
-
-'''
-hand = {
-	'Carrion Feeder': 1,
-	'Gravecrawler': 0,
-	'Insolent Neonate': 1,
-	'Stitchers Supplier': 0,
-	'Bloodghast': 1,
-	'Satyr Wayfinder': 0,
-	'Vengevine': 0,
-	'Hogaak': 1,
-	'Faithless Looting': 1,
-	'Interactive': 0,
-	'Bloodstained Mire': 1,
-	'City of Brass': 1
-}
-
-bottom = {
-	'Carrion Feeder': 0,
-	'Gravecrawler': 0,
-	'Insolent Neonate': 0,
-	'Stitchers Supplier': 0,
-	'Bloodghast': 0,
-	'Satyr Wayfinder': 0,
-	'Vengevine': 0,
-	'Hogaak': 0,
-	'Faithless Looting': 0,
-	'Interactive': 0,
-	'Bloodstained Mire': 0,
-	'City of Brass': 0
-}
-drawfirst = True
-num_iterations = 1000
-
-number = simulate_one_specific_hand(hand, bottom, drawfirst, num_iterations)
-print( number ) 
-'''
-
+	return count_probability / sample_size_for_num_hands
 
 final_prob_for_7 = 0
 for drawfirst in [True, False]:
