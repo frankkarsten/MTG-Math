@@ -1,17 +1,28 @@
 '''
 CLARIFICATION 1: Why did I choose to focus on this conditional probability?
 I found the probability I determined interesting for several reasons:
-•	I condition on drawing a Castle because I don't care whether or not I drew a Mountain if I don’t have a Castle. The presence of a Castle effectively reduces the number of draws that could produce a Mountain.
-•	I take into account mulligans because you would never keep 1 Castle and 6 spells in practice, nor would you keep 2 Castle and 5 Mountains. Including these hands would skew the probabilities in a way that wouldn’t match reality.
-•	I focused on turns 2 and 3 because these may often be the turn where you have to drop a Castle and where curving out with an untapped land is important.
+•	I condition on drawing a Castle because I don't care whether or not I drew a Mountain if I don’t have a Castle. 
+	The presence of a Castle effectively reduces the number of draws that could produce a Mountain.
+•	I take into account mulligans because you would never keep 1 Castle and 6 spells in practice.
+	Nor would you keep 2 Castle and 5 Mountains. 
+	Including these hands would skew the probabilities in a way that wouldn’t match reality.
+•	I focused on turns 2 and 3 because these may often be the turn where you have to drop a Castle.
+	Also, these are the key turns where curving out with an untapped land is important.
 '''
 
 '''
 CLARIFICATION 2: How are London mulligans handled?
 •	A 7-card hand is kept if it has 2, 3, 4, or 5 lands. It is mulliganed otherwise.
-•	For a mulligan to 6, we first choose what to put on the bottom and decide keep or mull afterwards. To get a good mix, we bottom a spell if we drew 4+ spells and we bottom a land if we drew 4+ lands. Afterwards, we keep if we hold 2, 3, or 4 lands. Otherwise, we mulligan.
-•	When bottoming lands, we might choose between Castles, basics, and other lands. We always keep one Castle if possible and bottom any Castles as much as needed. Next, we bottom as many other lands as needed. Finally, we bottom basics as needed. This also applies to 5-card and 4-card hands.
-•	For a mulligan to 5, we try to get close to 3 lands and 2 spells. So we bottom two spells if we drew 4+ spells, we bottom a spell and a land if we drew 3 spells, and we bottom two lands if we drew 2 spells. Afterwards, we keep if we have 2, 3, or 4 lands; otherwise, we mulligan.
+•	For a mulligan to 6, we first choose what to put on the bottom and decide keep or mull afterwards. 
+	To get a good mix, we bottom a spell if we drew 4+ spells and we bottom a land if we drew 4+ lands. 
+	Afterwards, we keep if we hold 2, 3, or 4 lands. Otherwise, we mulligan.
+•	When bottoming lands, we might choose between Castles, basics, and other lands. 
+	We always keep one Castle if possible and bottom any Castles as much as needed. 
+	Next, we bottom as many other lands as needed. Finally, we bottom basics as needed. 
+	This also applies to 5-card and 4-card hands.
+•	For a mulligan to 5, we try to get close to 3 lands and 2 spells. 
+	So we bottom two spells if we drew 4+ spells, we bottom a spell and a land if we drew 3 spells, and we bottom two lands if we drew 2 spells.
+	Afterwards, we keep if we have 2, 3, or 4 lands; otherwise, we mulligan.
 •	For a mulligan to 4, we try to get close to 3 lands and 1 spell. Then we always keep.
 '''
 
@@ -21,7 +32,8 @@ Although my numbers are based on a 24-land deck, they remain useful as good esti
 •	20 land deck: 10 basics, 4 Castles, 6 other lands: 87.9% probability of drawing a basic for a Castle by turn 3
 •	24 land deck: 10 basics, 4 Castles, 10 other lands: 85.2% probability of drawing a basic for a Castle by turn 3 (cf. the table)
 •	28 land deck: 10 basics, 4 Castles, 14 other lands: 83.4% probability of drawing a basic for a Castle by turn 3
-Generally speaking, compared to a 24-land deck the probabilities are generally 2-3 percentage points higher for 20-land decks and 1-2 percentage points lower for 28-land decks. This is not a big difference.
+Generally speaking, compared to a 24-land deck the probabilities are generally 2-3 percentage points higher for 20-land decks and 1-2 percentage points lower for 28-land decks. 
+This is not a big difference.
 '''
 
 '''
@@ -194,4 +206,5 @@ for num_basics in range(2,21):
 		log("Now at "+str(total_favorable_games)+" favorable out of "+str(total_relevant_games)+" relevant")
 
 	print('Consider games where you drew a Castle by turn '+str(turn_of_interest))
-	print("Probability of also drawing a basic by that turn is "+str(round(total_favorable_games / total_relevant_games * 100.0 ,1))+"%.")
+	print("Probability of also drawing a basic by that turn is "
+		+str(round(total_favorable_games / total_relevant_games * 100.0 ,1))+"%.")
