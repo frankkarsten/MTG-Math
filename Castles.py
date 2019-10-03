@@ -42,7 +42,7 @@ Although my numbers are based on a 4-Castle deck, they remain useful as good est
 •	2 Castle deck: 10 basics, 2 Castles, 12 other lands: 84.4% probability of drawing a basic for a Castle by turn 3
 •	3 Castle deck: 10 basics, 3 Castles, 11 other lands: 84.8% probability of drawing a basic for a Castle by turn 3 
 •	4 Castle deck: 10 basics, 4 Castles, 10 other lands: 85.2% probability of drawing a basic for a Castle by turn 3 (cf. the table)
-This diffeence is negligible.
+This difference is negligible.
 '''
 
 import random
