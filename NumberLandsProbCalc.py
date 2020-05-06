@@ -108,10 +108,14 @@ def run_one_sim():
 num_simulations = 5000000
 #Uncertainty with five million simulations will be about +/- 0.03%
 
-for deck_size in [60,80]:
+for deck_size in [60,80, 99]:
 	print("===> We now consider decks of size " + str(deck_size))
-	land_set = range(21,31) if deck_size == 60 else range(27,41)
-	for nr_lands in land_set:
+	land_set = {
+		60: range(21,31),
+		80: range(27,41),
+		99: range(34,52)
+	}
+	for nr_lands in land_set[deck_size]:
 		decklist = {
 			'Spell': deck_size - nr_lands,
 			'Land': nr_lands
