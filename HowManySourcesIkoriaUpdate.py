@@ -112,7 +112,7 @@ def run_one_sim():
 	if total_lands(hand) < turn_allowed:
 		return 'Irrelevant for conditioning'
 
-num_simulations = 100
+num_simulations = 1000000
 #Uncertainty with five million simulations will be about +/- 0.03%
 
 nr_lands = {
