@@ -28,87 +28,81 @@ def multivariate_hypgeom(deck, needed):
 		sum_needed += needed[card]
 	return answer / binom(sum_deck, sum_needed)
 
-def determine_ComboHand(handsize = 7):
-	"""	
-	Parameters:
-		handsize - Should only be used for Vancouver rule. Represents the number of cards you mulligan towards
-	Returns - a number that represents the probability of finding an opening hand with one of each combo piece and two lands
-	"""
+with open("Output.csv","w") as writer:
+	writer.write('Creatures,P[0 creatures],P[1 creature],P[2+ creatures],E[creatures],E[mana]')
 
-for ThreeManaGoblins in [9, 10, 11, 12, 13, 14, 15]:
+	for ThreeManaGoblins in [9, 10, 11, 12, 13, 14, 15]:
+		deck = {
+			'OneDrop': 4,
+			'TwoDrop': 8,
+			'ThreeDrop': ThreeManaGoblins,
+			'Krenko': 4,
+			'FourDrop': 1,
+		}
+		deck['Other'] = 59 - deck['OneDrop'] - deck['TwoDrop'] - deck['ThreeDrop'] - deck['FourDrop'] - deck['Krenko']
+
+		ProbabilityToHitExactlyZeroCreatures = 0
+		ProbabilityToHitExactlyOneCreature = 0
+		ProbabilityToHitAtLeastTwoCreatures = 0
+		ExpectedCreatures = 0
+		ExpectedMana = 0
+
+		for OneDrop in range(min(deck['OneDrop'] +1, 7)):
+			for TwoDrop in range(min(deck['TwoDrop'] +1, 7)):
+				for ThreeDrop in range(min(deck['ThreeDrop'] +1, 7)):
+					for FourDrop in range(min(deck['FourDrop'] +1, 7)):
+						for Krenko in range(min(deck['Krenko'] +1, 7)):
+							for Other in range(min(deck['Other'] +1, 7)):
+								if OneDrop + TwoDrop + ThreeDrop + FourDrop + Krenko + Other == 6:
+									needed = {
+										'OneDrop': OneDrop,
+										'TwoDrop': TwoDrop,
+										'ThreeDrop': ThreeDrop,
+										'FourDrop': FourDrop,
+										'Krenko': Krenko,
+										'Other': Other
+									}
+									Probability = multivariate_hypgeom(deck, needed)
+									ActualKrenko = min(1, Krenko)
+									Creatures = OneDrop + TwoDrop + ThreeDrop + FourDrop + ActualKrenko
+									if (Creatures == 0):
+										ProbabilityToHitExactlyZeroCreatures += Probability
+									if (Creatures == 1):
+										ProbabilityToHitExactlyOneCreature += Probability
+									if (Creatures >= 2):
+										ProbabilityToHitAtLeastTwoCreatures += Probability
+									ExpectedMana += Probability * (1 * OneDrop + 2 * TwoDrop + 3 * ThreeDrop + 4 * FourDrop + 4 * ActualKrenko)
+									ExpectedCreatures += Probability * Creatures
+								
+		Creatures = deck['OneDrop'] + deck['TwoDrop'] + deck['ThreeDrop'] + deck['FourDrop'] + deck['Krenko']
+		print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitExactlyZeroCreatures = ' + str(round(100 * ProbabilityToHitExactlyZeroCreatures, 1))+"%")
+		print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitExactlyOneCreature = ' + str(round(100 * ProbabilityToHitExactlyOneCreature, 1))+"%")
+		print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitAtLeastTwoCreatures = ' + str(round(100 * ProbabilityToHitAtLeastTwoCreatures, 1))+"%")
+		print('\nFor this '+str(Creatures)+'-creature deck, Expected Creatures = ' + str(round(ExpectedCreatures, 2)))
+		print('\nFor this '+str(Creatures)+'-creature deck, ExpectedMana = ' + str(round(ExpectedMana, 2)))
+		writer.write('\n'+str(Creatures)+','+str(round(100 * ProbabilityToHitExactlyZeroCreatures, 1))+"%,"+ str(round(100 * ProbabilityToHitExactlyOneCreature, 1))+"%,"+ str(round(100 * ProbabilityToHitAtLeastTwoCreatures, 1))+"%,"+ str(round(ExpectedCreatures, 2))+','+ str(round(ExpectedMana, 2)))
+		
+	#Determine probability to hit both a haste lord and Krenko	
 	deck = {
-		'OneDrop': 4,
-		'TwoDrop': 8,
-		'ThreeDrop': ThreeManaGoblins,
-		'FourDrop': 5,
+		'ThreeDrop': 8,
+		'Krenko': 4,
 	}
-	deck['Other'] = 59 - deck['OneDrop'] - deck['TwoDrop'] - deck['ThreeDrop'] - deck['FourDrop']
+	deck['Other'] = 59 - deck['ThreeDrop'] - deck['Krenko']
 
-	ProbabilityToHitExactlyZeroCreatures = 0
-	ProbabilityToHitExactlyOneCreature = 0
-	ProbabilityToHitAtLeastTwoCreatures = 0
-	ExpectedCreatures = 0
-	ExpectedMana = 0
+	ProbabilityToWin = 0
 
-	for OneDrop in range(min(deck['OneDrop'], 7)):
-		for TwoDrop in range(min(deck['TwoDrop'], 7)):
-			for ThreeDrop in range(min(deck['ThreeDrop'], 7)):
-				for FourDrop in range(min(deck['FourDrop'], 7)):
-					for Other in range(min(deck['Other'], 7)):
-						if OneDrop + TwoDrop + ThreeDrop + FourDrop + Other == 6:
-							needed = {
-								'OneDrop': OneDrop,
-								'TwoDrop': TwoDrop,
-								'ThreeDrop': ThreeDrop,
-								'FourDrop': FourDrop,
-								'Other': Other
-							}
-							Probability = multivariate_hypgeom(deck, needed)
-							Creatures = OneDrop + TwoDrop + ThreeDrop + FourDrop
-							if (Creatures == 0):
-								ProbabilityToHitExactlyZeroCreatures += Probability
-							if (Creatures == 1):
-								ProbabilityToHitExactlyOneCreature += Probability
-							if (Creatures >= 2):
-								ProbabilityToHitAtLeastTwoCreatures += Probability
-							ExpectedMana += Probability * (1 * OneDrop + 2 * TwoDrop + 3 * ThreeDrop + 4 * FourDrop)
-							ExpectedCreatures += Probability * Creatures
+	for ThreeDrop in range(min(deck['ThreeDrop'] +1, 7)):
+		for Krenko in range(min(deck['Krenko'] +1, 7)):
+			for Other in range(min(deck['Other'] +1, 7)):
+				if ThreeDrop + Krenko + Other == 6:
+					needed = {
+						'ThreeDrop': ThreeDrop,
+						'Krenko': Krenko,
+						'Other': Other
+					}
+					Probability = multivariate_hypgeom(deck, needed)
+					if (ThreeDrop > 0 and Krenko > 0):
+						ProbabilityToWin += Probability
 							
-	Creatures = deck['OneDrop'] + deck['TwoDrop'] + deck['ThreeDrop'] + deck['FourDrop']
-	print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitExactlyZeroCreatures = ' + str(round(100 * ProbabilityToHitExactlyZeroCreatures, 1))+"%")
-	print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitExactlyOneCreature = ' + str(round(100 * ProbabilityToHitExactlyOneCreature, 1))+"%")
-	print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToHitAtLeastTwoCreatures = ' + str(round(100 * ProbabilityToHitAtLeastTwoCreatures, 1))+"%")
-	print('\nFor this '+str(Creatures)+'-creature deck, Expected Creatures = ' + str(round(ExpectedCreatures, 2)))
-	print('\nFor this '+str(Creatures)+'-creature deck, ExpectedMana = ' + str(round(ExpectedMana, 2)))
-	
-#Determine probability to hit both a haste lord and Krenko	
-deck = {
-	'OneDrop': 4,
-	'TwoDrop': 8,
-	'ThreeDrop': 8,
-	'FourDrop': 4,
-}
-deck['Other'] = 59 - deck['OneDrop'] - deck['TwoDrop'] - deck['ThreeDrop'] - deck['FourDrop']
-
-ProbabilityToWin = 0
-
-for OneDrop in range(min(deck['OneDrop'], 7)):
-	for TwoDrop in range(min(deck['TwoDrop'], 7)):
-		for ThreeDrop in range(min(deck['ThreeDrop'], 7)):
-			for FourDrop in range(min(deck['FourDrop'], 7)):
-				for Other in range(min(deck['Other'], 7)):
-					if OneDrop + TwoDrop + ThreeDrop + FourDrop + Other == 6:
-						needed = {
-							'OneDrop': OneDrop,
-							'TwoDrop': TwoDrop,
-							'ThreeDrop': ThreeDrop,
-							'FourDrop': FourDrop,
-							'Other': Other
-						}
-						Probability = multivariate_hypgeom(deck, needed)
-						if (ThreeDrop > 0 and FourDrop > 0):
-							ProbabilityToWin += Probability
-						
-Creatures = deck['OneDrop'] + deck['TwoDrop'] + deck['ThreeDrop'] + deck['FourDrop']
-print('-'*10)
-print('\nFor this '+str(Creatures)+'-creature deck, ProbabilityToWin = ' + str(round(100 * ProbabilityToWin, 1))+"%")
+	print('\n'+'-'*10)
+	print('\nFinally, ProbabilityToWin = ' + str(round(100 * ProbabilityToWin, 1))+"%")
