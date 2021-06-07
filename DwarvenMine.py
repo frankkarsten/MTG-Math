@@ -160,6 +160,8 @@ def run_one_sim(decklist, sim_type = 'Mine'):
 			hand['Brainstorm'] -= 1
 			card_drawn = library.pop(0)
 			hand[card_drawn] += 1
+			card_drawn = library.pop(0)
+			hand[card_drawn] += 1
 		#Play a land. No point in playing an Island for the purpose of this calculation
 		if turn < 4:
 			if hand['Dual'] > 0:
