@@ -5,6 +5,8 @@ from collections import Counter
 from random import shuffle
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+
 
 #Grab MTG oracle information (bulk data downloaded from Scryfall) to match cardnames to mana value
 all_cards = pd.read_json('oracle-cards-20210615090438.json')
@@ -111,7 +113,11 @@ for mtg_format in ['Standard', 'Historic', 'Modern', 'Legacy', 'Vintage']:
         exp_exile_per_deck.append((total_exiled_for_this_deck / nr_sims_per_deck, deck['decklist']))
     plt.figure(figsize=(20,12), dpi = 300)
     exp_exile_per_deck.sort()
-    sns.countplot(x=cards_exiled_list).set_title(f'Distribution of cards exiled in {total_sims:,} simulations against a variety of decks in {mtg_format}')
+    print("Distribution:", Counter(cards_exiled_list))
+    ax = sns.countplot(x=cards_exiled_list)
+    ax.set_title(f'Distribution of cards exiled in {total_sims:,} simulations against a variety of decks in {mtg_format}')
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax = 10000000))
+	sns.countplot(x=cards_exiled_list).set_title(f'Distribution of cards exiled in {total_sims:,} simulations against a variety of decks in {mtg_format}')
     plt.show()
     print('Expected cards exiled:', sum(cards_exiled_list) / total_sims)
     print('Against the biggest deck, exp cards exiled was', exp_exile_per_deck[0])
