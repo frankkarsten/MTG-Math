@@ -506,6 +506,39 @@ for G in reasonable_game_winrates:
 		break_even_point_reached = True
 
 print()
+print("---------Bo3 Sealed Events")
+print()		
+		
+bestof = 3
+max_wins = 4
+max_losses = 2
+gems_Sealed = {
+	0: 200,
+	1: 500,
+	2: 1200,
+	3: 1800,
+	4: 2200
+}
+
+entry_fee = 2000
+draft_packs_per_event = 6
+extra_value_Sealed = 3 * pack_value_in_gems
+break_even_point_reached = False
+
+for G in all_game_winrates:
+	
+	expected_gems = expected_payout(G, bestof, max_wins, max_losses, gems_Sealed)
+	expected_total_value = expected_gems + draft_packs_per_event * draft_pack_value_in_gems + extra_value_Sealed
+	
+	if G in output_game_winrates:
+		output_string = f"For game winrate {G:.2f} (match winrate {match_win_prob(G):.3f}):"
+		output_string += f" {expected_gems:.0f} expected pure gems and {expected_total_value:.0f} gems in total value."
+		print(output_string)
+	if expected_gems > entry_fee and not break_even_point_reached:
+		print(f"Break-even at game win rate {G} (match winrate {match_win_prob(G):.3f})")
+		break_even_point_reached = True
+
+print()
 print("---------Sealed Events")
 print()		
 		
