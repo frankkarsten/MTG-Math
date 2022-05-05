@@ -306,14 +306,14 @@ gems_ArenaOpen_Day1_bo1 = {
 	4: 0,
 	5: 1000,
 	6: 2500,
-	7: 0
+	7: 5000
 }
 gems_ArenaOpen_Day1_bo3 = {
 	0: 0,
-	1: 1000,
+	1: 1500,
 	2: 3000,
 	3: 5000,
-	4: 0
+	4: 6000
 }
 max_wins_Day2 = 8
 max_losses_Day2 = 2
@@ -328,12 +328,12 @@ for G in all_game_winrates:
 	bestof = 3
 	#Six or more wins on Day 2 of an Arena Open now also grants a Qualifier Weekend token
 	gems_ArenaOpen_Day2 = {
-		0: 5000,
-		1: 5000,
-		2: 5000,
-		3: 7500,
-		4: 10000,
-		5: 25000,
+		0: 0,
+		1: 0,
+		2: 0,
+		3: 2500,
+		4: 5000,
+		5: 20000,
 		6: 1000 * gem_per_dollar + totalEV[G],
 		7: 2000 * gem_per_dollar + totalEV[G],
 		8: 2500 * gem_per_dollar + totalEV[G]
