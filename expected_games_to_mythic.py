@@ -16,7 +16,7 @@ def log(s):
 steps_gained_with_win ={
 	'bronze':2,
 	'silver':2,
-	'gold':1,
+	'gold':2,
 	'platinum':1,
 	'diamond':1
 	}
