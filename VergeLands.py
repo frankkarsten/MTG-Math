@@ -4,10 +4,10 @@ then what is the probability that you’ve also drawn a corresponding basic-type
 
 CLARIFICATION 1: Why did I choose to focus on this conditional probability?
 I found the probability I determined interesting for several reasons:
-•	I condition on drawing a Verge land because I don't care whether or not I drew a basic-type land if I don’t have a Verge land. 
+•	I condition on drawing a Verge land because I don't care whether or not I drew a basic-type land if I don’t have a Verge land.
 	The presence of a Verge land effectively reduces the number of draws that could produce a basic-type land.
 •	I take into account mulligans because you would never keep 1 Verge land and 6 spells in practice.
-	Nor would you keep 2 Verge land and 5 basic lands. 
+	Nor would you keep 2 Verge land and 5 basic lands.
 	Including these hands would skew the probabilities in a way that wouldn’t match reality.
 •	I focused on turns 2, 3, and 4 because that's often the turn where you need the secondary color of mana.
 '''
@@ -15,14 +15,14 @@ I found the probability I determined interesting for several reasons:
 '''
 CLARIFICATION 2: How are London mulligans handled?
 •	A 7-card hand is kept if it has 2, 3, 4, or 5 lands. It is mulliganed otherwise.
-•	For a mulligan to 6, we first choose what to put on the bottom and decide keep or mull afterwards. 
-	To get a good mix, we bottom a spell if we drew 4+ spells and we bottom a land if we drew 4+ lands. 
+•	For a mulligan to 6, we first choose what to put on the bottom and decide keep or mull afterwards.
+	To get a good mix, we bottom a spell if we drew 4+ spells and we bottom a land if we drew 4+ lands.
 	Afterwards, we keep if we hold 2, 3, or 4 lands. Otherwise, we mulligan.
-•	When bottoming lands, we might choose between Verge lands, basics, and other lands. 
-	We always keep one Verge land if possible and bottom any other Verge lands as much as needed. 
-	Next, we bottom as many other lands as needed. Finally, we bottom basics as needed. 
+•	When bottoming lands, we might choose between Verge lands, basics, and other lands.
+	We always keep one Verge land if possible and bottom any other Verge lands as much as needed.
+	Next, we bottom as many other lands as needed. Finally, we bottom basics as needed.
 	This also applies to 5-card and 4-card hands.
-•	For a mulligan to 5, we try to get close to 3 lands and 2 spells. 
+•	For a mulligan to 5, we try to get close to 3 lands and 2 spells.
 	So we bottom two spells if we drew 4+ spells, we bottom a spell and a land if we drew 3 spells, and we bottom two lands if we drew 2 spells.
 	Afterwards, we keep if we have 2, 3, or 4 lands; otherwise, we mulligan.
 •	For a mulligan to 4, we try to get close to 3 lands and 1 spell. Then we always keep.
@@ -40,7 +40,7 @@ def log(s):
 DEBUG = False
 
 def put_lands_on_bottom(hand, lands_remaining_to_bottom):
-	"""	
+	"""
 	Parameters:
 		hand - A dictionary, with the same cardnames as in decklist, with number drawn
 		lands_remaining_to_bottom - The number of lands to bottom (>= number of lands in hand)
@@ -60,13 +60,13 @@ def put_lands_on_bottom(hand, lands_remaining_to_bottom):
 def nr_lands(hand):
 	return hand['Basic land'] + hand['Other land'] + hand['Verge land']
 
-def run_one_sim():	
-	keephand = False 
+def run_one_sim():
+	keephand = False
 	for handsize in [7, 6, 5, 4]:
 		#We may mull 7, 6, or 5 cards and keep every 4-card hand
 		#Once we actually keep, the variable keephand will be set to True
 		if not keephand:
-			
+
 			#Construct library as a list
 			library = []
 			for card in decklist.keys():
@@ -133,17 +133,17 @@ def run_one_sim():
 					put_lands_on_bottom(hand,1)
 				elif hand['Spell'] == 2:
 					#Two land, one spell on the bottom
-					hand['Spell'] -= 2
+					hand['Spell'] -= 1
 					put_lands_on_bottom(hand,2)
 				else:
 					#The hand has 0 or 1 spell so we put three land on the bottom
 					put_lands_on_bottom(hand,3)
 				#Do we keep?
 				keephand = True
-			
+
 			log("Keephand is now "+str(keephand)+" and hand is now:")
 			log(hand)
-			
+
 	for turn in range(1, turn_of_interest + 1):
 		#If, e.g., turn_of_interest is 3 then this range is {1, 2, 3}
 		log("We enter turn "+str(turn))
@@ -176,13 +176,13 @@ for num_basics in range(4, total_nr_lands - nr_Verge_land):
 		'Other land': total_nr_lands - nr_Verge_land - num_basics,
 		'Spell': deck_size - total_nr_lands
 	}
-	
+
 	#print("We now consider the following decklist:")
 	#print(Counter(decklist))
 
 	total_relevant_games = 0.0
 	total_favorable_games = 0.0
-		
+
 	for i in range(num_simulations):
 		log("----------SIM "+str(i))
 		Outcome = run_one_sim()
