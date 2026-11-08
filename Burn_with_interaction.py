@@ -309,7 +309,7 @@ decklist = {
 	'Sacred Foundry': Lands
 }
 
-with open("burn_output.csv","w") as file:
+with open("burn_output.csv","w", encoding="utf-8") as file:
 	file.write("Hand, drawfirst, probability, keep or mull at 7, exp kill turn at 7, keep or mull at 6, best bottom at 6, keep or mull at 5, best bottom at 5")
 	file.write("\n")
 
